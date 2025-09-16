@@ -1,0 +1,37 @@
+{
+  "name": "chat_app_node",
+  "version": "1.0.0",
+  "description": "chat application using node.js",
+  "keywords": [
+    "node",
+    "js"
+  ],
+  "homepage": "https://github.com/indranildigitalaptech/chat_app#readme",
+  "bugs": {
+    "url": "https://github.com/indranildigitalaptech/chat_app/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/indranildigitalaptech/chat_app.git"
+  },
+  "license": "MIT",
+  "author": "Indranil Sahu",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server",
+    "dev": "nodemon server"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "hpp": "^0.2.3",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

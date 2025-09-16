@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Add Navbar -->
+    <%- include("components/navbar", {title : "✨ Team SPD Chat App"}) %>
+
+    <!-- Main Container -->
+    <div class="container my-4 flex-grow-1 d-flex flex-column">
+        <!-- Chat Box -->
+        <div id="chat-box" class="flex-grow-1 mb-3">
+        </div>
+
+        <!-- Input Section -->
+        <form id="chat-form" class="d-flex" id="chat-form">
+            <input type="text" class="form-control me-2" placeholder="Type your message..." id="user-msg" required>
+            <button class="btn btn-primary" id="send-msg" type="submit">Send</button>
+        </form>
+    </div>
+
+    <!-- Include Footer -->
+    <%- include("components/footer") %>
+
+    <!-- Scripts -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/chat.js"></script>
+    <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
