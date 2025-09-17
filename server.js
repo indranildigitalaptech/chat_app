@@ -20,32 +20,55 @@ const io = new Server(server, {
 
 // serve static files
 app.use(express.static(path.join(process.cwd(), "public")));
-// app.use(cors());
-// app.use(helmet());
-// app.use(hpp());
+app.use(cors());
+app.use(helmet());
+app.use(hpp());
 
 // set view engine
 app.set("views", path.join(process.cwd(), "views"));
 app.set("view engine", "ejs");
 
+// Store connected users { socket.id: username }
+const users = {};
+
 // --- SOCKET HANDLER ---
 io.on("connection", (socket) => {
-  console.log("New User connected: ", socket.id);
+  console.log("New User connected:", socket.id);
 
-  // Welcome only that user
+  // Send welcome only to that user
   socket.emit("message", { type: "system", text: "Welcome to the chat 🎉" });
 
-  // Notify others
-  socket.broadcast.emit("message", { type: "system", text: "A new user joined the chat 👋" });
+  // Handle setting username
+  socket.on("setUsername", (username) => {
+    users[socket.id] = username || "Anonymous";
+
+    // Notify others
+    socket.broadcast.emit("message", {
+      type: "system",
+      text: `${users[socket.id]} joined the chat 👋`,
+    });
+  });
 
   // When receiving a message
   socket.on("message", (msg) => {
-    io.emit("message", { type: "user", id: socket.id, text: msg });
+    if (!users[socket.id]) return; // ignore until username is set
+
+    io.emit("message", {
+      type: "user",
+      user: users[socket.id],
+      text: msg,
+    });
   });
 
-  // When disconnecting
+  // Handle disconnect
   socket.on("disconnect", () => {
-    io.emit("message", { type: "system", text: "A user left the chat ❌" });
+    const username = users[socket.id] || "A user";
+    delete users[socket.id];
+
+    io.emit("message", {
+      type: "system",
+      text: `${username} left the chat ❌`,
+    });
   });
 });
 
@@ -53,6 +76,6 @@ app.get("/", (req, res) => {
   res.render("index");
 });
 
-server.listen(process.env.PORT, () => {
-  console.log(`Server is running on port ${process.env.PORT}`);
+server.listen(process.env.PORT || 4200, () => {
+  console.log(`✅ Server is running on port ${process.env.PORT || 4200}`);
 });

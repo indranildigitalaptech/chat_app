@@ -8,7 +8,6 @@
 
     <link rel="stylesheet" href="/css/global.css">
     <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
-
 </head>
 
 <body class="d-flex flex-column min-vh-100">
@@ -16,14 +15,23 @@
     <!-- Add Navbar -->
     <%- include("components/navbar", {title : "✨ Team SPD's Room"}) %>
 
-    <!-- Main Container -->
-    <div class="container my-4 flex-grow-1 d-flex flex-column">
-        <!-- Chat Box -->
-        <div id="chat-box" class="flex-grow-1 mb-3">
+    <!-- Username Modal -->
+    <div id="username-modal"
+        class="d-flex align-items-center justify-content-center position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-75">
+        <div class="bg-white p-4 rounded shadow" style="max-width: 400px; width: 100%;">
+            <h5 class="mb-3">Enter your name</h5>
+            <input type="text" id="username-input" class="form-control mb-3" placeholder="Your name..." required>
+            <button id="set-username" class="btn btn-primary w-100">Join Chat</button>
         </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container my-4 flex-grow-1 d-flex flex-column d-none" id="chat-container">
+        <!-- Chat Box -->
+        <div id="chat-box" class="flex-grow-1 mb-3 border rounded p-2 overflow-auto"></div>
 
         <!-- Input Section -->
-        <form id="chat-form" class="d-flex" id="chat-form">
+        <form id="chat-form" class="d-flex">
             <input type="text" class="form-control me-2" placeholder="Type your message..." id="user-msg" required>
             <button class="btn btn-primary" id="send-msg" type="submit">Send</button>
         </form>
