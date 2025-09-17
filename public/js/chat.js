@@ -1,6 +1,7 @@
 // Use backend URL from env (change in production)
-const BACKEND_URL = "https://team-spd-chat.vercel.app";   // Or "https://your-backend-url.com"
-const socket = io(BACKEND_URL);
+const socket = io("https://team-spd-chat.vercel.app", {
+  transports: ["websocket", "polling"], // fallback to polling
+});
 
 const chatBox = document.getElementById("chat-box");
 const chatForm = document.getElementById("chat-form");
