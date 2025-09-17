@@ -8,60 +8,104 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "*" } });
 
+const io = new Server(server, {
+  cors: { origin: "*", methods: ["GET", "POST"] },
+});
+
+// Serve static files
 app.use(express.static(path.join(process.cwd(), "public")));
+
+// View engine
 app.set("views", path.join(process.cwd(), "views"));
 app.set("view engine", "ejs");
 
-const users = {}; // socketId -> username
+// Store users: socketId -> { username, timeoutId }
+const users = {};
 
 io.on("connection", (socket) => {
-  console.log("✅ Connected:", socket.id);
+  console.log(`✅ Connected: ${socket.id}`);
 
-  // Set username
+  // Handle setting username
   socket.on("setUsername", (username) => {
+    if (!username || typeof username !== "string") return;
+    username = username.trim();
     if (!username) return;
-    users[socket.id] = username;
 
-    // Welcome user
-    socket.emit("message", { type: "system", text: `Welcome ${username} 🎉` });
+    users[socket.id] = { username, timeoutId: null };
 
-    // Notify others
+    // Broadcast join message
     socket.broadcast.emit("message", {
       type: "system",
       text: `${username} joined the chat 👋`,
     });
+
+    // Welcome user
+    socket.emit("message", { type: "system", text: `Welcome ${username} 🎉` });
+
+    // Start inactivity auto-logout timer
+    resetInactivityTimer(socket.id);
   });
 
-  // Handle messages
+  // Handle incoming messages
   socket.on("message", (msg) => {
-    const username = users[socket.id];
-    if (!username) {
-      socket.emit("message", {
-        type: "system",
-        text: "⚠️ You must set a username before chatting.",
-      });
+    const user = users[socket.id];
+    if (!user) {
+      socket.emit("message", { type: "system", text: "⚠️ You must set a username first." });
       return;
     }
-    io.emit("message", { type: "user", username, text: msg });
+
+    if (!msg || typeof msg !== "string") return;
+
+    // Broadcast message to everyone
+    io.emit("message", { type: "user", username: user.username, text: msg });
+
+    // Reset inactivity timer
+    resetInactivityTimer(socket.id);
   });
 
-  // Disconnect
+  // Handle logout from client
+  socket.on("logout", () => {
+    logoutUser(socket.id);
+  });
+
+  // Handle disconnect
   socket.on("disconnect", () => {
-    const username = users[socket.id];
-    if (username) {
-      io.emit("message", { type: "system", text: `${username} left the chat ❌` });
-      delete users[socket.id];
-    }
+    logoutUser(socket.id);
   });
 });
+
+// Auto-logout helper
+function resetInactivityTimer(socketId) {
+  const user = users[socketId];
+  if (!user) return;
+
+  if (user.timeoutId) clearTimeout(user.timeoutId);
+
+  // Auto logout after 10 minutes
+  user.timeoutId = setTimeout(() => {
+    const socket = io.sockets.sockets.get(socketId);
+    if (socket) {
+      socket.emit("forceLogout");
+      logoutUser(socketId);
+    }
+  }, 10 * 60 * 1000);
+}
+
+// Logout user helper
+function logoutUser(socketId) {
+  const user = users[socketId];
+  if (!user) return;
+
+  io.emit("message", { type: "system", text: `${user.username} left the chat ❌` });
+
+  if (user.timeoutId) clearTimeout(user.timeoutId);
+  delete users[socketId];
+}
 
 app.get("/", (req, res) => {
   res.render("index");
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+server.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));

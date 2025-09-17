@@ -2,78 +2,70 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <link rel="icon" type="image/jpg" href="/images/spd.jpg">
-    <title>Realtime Chat App | Team SPD Emergency</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/jpg" href="/images/spd.jpg">
+  <title>Realtime Chat App | Team SPD Emergency</title>
 
-    <!-- Add SEO -->
-    <!-- Primary Meta Tags -->
-    <meta name="title" content="Realtime Chat App | Team SPD">
-    <meta name="description"
-        content="Join Team SPD's realtime chat room. Connect instantly with users, enjoy smooth UI, colorful messages, and a fun chat experience.">
+  <!-- SEO Meta -->
+  <meta name="title" content="Realtime Chat App | Team SPD">
+  <meta name="description" content="Join Team SPD's realtime chat room. Connect instantly with users, enjoy smooth UI, colorful messages, and a fun chat experience.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://team-spd-chat.vercel.app/">
+  <meta property="og:title" content="Realtime Chat App | Team SPD">
+  <meta property="og:description" content="Join Team SPD's realtime chat room. Chat instantly with multiple users, enjoy smooth UI and colorful messages.">
+  <meta property="og:image" content="https://team-spd-chat.vercel.app/images/spd.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://team-spd-chat.vercel.app/">
+  <meta name="twitter:title" content="Realtime Chat App | Team SPD">
+  <meta name="twitter:description" content="Join Team SPD's realtime chat room. Chat instantly with multiple users, enjoy smooth UI and colorful messages.">
+  <meta name="twitter:image" content="https://team-spd-chat.vercel.app/images/spd.jpg">
 
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://team-spd-chat.vercel.app/">
-    <meta property="og:title" content="Realtime Chat App | Team SPD">
-    <meta property="og:description"
-        content="Join Team SPD's realtime chat room. Connect with users instantly, enjoy smooth UI and colorful messages in a fun and interactive environment.">
-    <meta property="og:image" content="https://team-spd-chat.vercel.app/images/spd.jpg">
-
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://team-spd-chat.vercel.app/">
-    <meta name="twitter:title" content="Realtime Chat App | Team SPD">
-    <meta name="twitter:description"
-        content="Join Team SPD's realtime chat room. Chat instantly with multiple users, enjoy smooth UI, colorful messages, and a fun interactive experience.">
-    <meta name="twitter:image" content="https://team-spd-chat.vercel.app/images/spd.jpg">
-
-
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Global custom CSS -->
-    <link rel="stylesheet" href="/css/global.css">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Global custom CSS -->
+  <link rel="stylesheet" href="/css/global.css">
 </head>
 
 <body class="d-flex flex-column min-vh-100">
 
-    <!-- Username Overlay -->
-    <div id="username-modal" class="username-overlay">
-        <div class="username-box">
-            <h4 class="mb-3 text-dark text-center">Enter your username</h4>
-            <form id="username-form" autocomplete="off">
-                <input id="username-input" class="form-control mb-3" placeholder="Your name" required />
-                <button class="btn btn-primary w-100" type="submit">Join Chat</button>
-            </form>
-        </div>
+  <!-- Username Overlay -->
+  <div id="username-modal" class="username-overlay">
+    <div class="username-box">
+      <h4 class="mb-3 text-dark text-center">Enter your username</h4>
+      <form id="username-form" autocomplete="off">
+        <input id="username-input" class="form-control mb-3" placeholder="Your name" required />
+        <button class="btn btn-primary w-100" type="submit">Join Chat</button>
+      </form>
     </div>
+  </div>
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
-        <h1 class="navbar-brand">✨ Team SPD's Room</h1>
-    </nav>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3 d-flex justify-content-between">
+    <h1 class="navbar-brand mb-0">✨ Team SPD's Room</h1>
+    <!-- Logout button will be injected via chat.js -->
+  </nav>
 
-    <!-- Main Chat Area -->
-    <div class="container my-4 flex-grow-1 d-flex flex-column">
-        <!-- Chat Box -->
-        <div id="chat-box" class="flex-grow-1 mb-3 d-flex flex-column"></div>
+  <!-- Main Chat Area -->
+  <div class="container my-4 flex-grow-1 d-flex flex-column">
+    <!-- Chat Box -->
+    <div id="chat-box" class="flex-grow-1 mb-3 d-flex flex-column"></div>
 
-        <!-- Chat Input (hidden until username set) -->
-        <form id="chat-form" class="d-flex" style="display:none;">
-            <input type="text" id="chat-input" class="form-control me-2" placeholder="Type your message..." required />
-            <button type="submit" class="btn btn-success">Send</button>
-        </form>
-    </div>
+    <!-- Chat Input -->
+    <form id="chat-form" class="d-flex" style="display:none;">
+      <input type="text" id="chat-input" class="form-control me-2" placeholder="Type your message..." required />
+      <button type="submit" class="btn btn-success">Send</button>
+    </form>
+  </div>
 
-    <!-- Footer -->
-    <footer class="text-center py-3 mt-auto bg-dark text-white-50">
-        <small>⚡ Built with Socket.IO & EJS</small>
-    </footer>
+  <!-- Footer -->
+  <footer class="text-center py-3 mt-auto bg-dark text-white-50">
+    <small>⚡ Built with Socket.IO & EJS | Team SPD</small>
+  </footer>
 
-    <!-- Scripts -->
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/js/chat.js"></script>
+  <!-- Scripts -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/chat.js"></script>
 </body>
 
 </html>

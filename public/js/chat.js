@@ -1,4 +1,5 @@
 const socket = io();
+
 const chatBox = document.getElementById("chat-box");
 const chatForm = document.getElementById("chat-form");
 const chatInput = document.getElementById("chat-input");
@@ -6,19 +7,36 @@ const usernameModal = document.getElementById("username-modal");
 const usernameForm = document.getElementById("username-form");
 const usernameInput = document.getElementById("username-input");
 
-// Load username from localStorage if exists
 let myUsername = localStorage.getItem("username") || "";
 
-if (myUsername) {
+// Logout button
+const logoutBtn = document.createElement("button");
+logoutBtn.textContent = "Logout";
+logoutBtn.className = "btn btn-danger ms-2";
+logoutBtn.addEventListener("click", () => doLogout());
+document.querySelector("nav").appendChild(logoutBtn);
+
+function showChat() {
   usernameModal.style.display = "none";
   chatForm.style.display = "flex";
-  socket.emit("setUsername", myUsername);
-} else {
-  usernameModal.style.display = "flex";
-  chatForm.style.display = "none";
+  logoutBtn.style.display = "inline-block";
 }
 
-// HTML escape helper to avoid XSS
+function hideChat() {
+  chatForm.style.display = "none";
+  logoutBtn.style.display = "none";
+  usernameModal.style.display = "flex";
+}
+
+// Login flow
+if (myUsername) {
+  showChat();
+  socket.emit("setUsername", myUsername);
+} else {
+  hideChat();
+}
+
+// Escape HTML
 function escapeHtml(str) {
   if (!str) return "";
   return str.replace(/[&<>"'`=\/]/g, (s) =>
@@ -35,52 +53,57 @@ function escapeHtml(str) {
   );
 }
 
-// Handle username submission
+// Username submission
 usernameForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const name = usernameInput.value.trim();
   if (!name) return;
   myUsername = name;
   localStorage.setItem("username", myUsername);
-  usernameModal.style.display = "none";
-  chatForm.style.display = "flex";
+  showChat();
   socket.emit("setUsername", myUsername);
 });
 
-// Receive messages from server
-socket.on("message", (message) => {
-  addMessage(message);
-});
+// Receive messages
+socket.on("message", (msg) => addMessage(msg));
 
-// Add message to chat box
-function addMessage(message) {
+// Forced logout from server
+socket.on("forceLogout", () => doLogout(true));
+
+// Add message
+function addMessage(msg) {
   const el = document.createElement("div");
   el.classList.add("message");
 
-  if (message.type === "system") {
+  if (msg.type === "system") {
     el.classList.add("message-system");
-    el.textContent = message.text;
-  } else if (message.username === myUsername) {
+    el.textContent = msg.text;
+  } else if (msg.username === myUsername) {
     el.classList.add("message-you");
-    el.textContent = message.text;
+    el.textContent = msg.text;
   } else {
     el.classList.add("message-other");
-    el.innerHTML = `<strong>${escapeHtml(message.username)}</strong>: ${escapeHtml(message.text)}`;
+    el.innerHTML = `<strong>${escapeHtml(msg.username)}</strong>: ${escapeHtml(msg.text)}`;
   }
 
   chatBox.appendChild(el);
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// Send chat messages
+// Send message
 chatForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const text = chatInput.value.trim();
   if (!text) return;
-  if (!myUsername) {
-    alert("⚠️ You must set a username before chatting.");
-    return;
-  }
   socket.emit("message", text);
   chatInput.value = "";
 });
+
+// Logout
+function doLogout(forced = false) {
+  socket.emit("logout");
+  localStorage.removeItem("username");
+  myUsername = "";
+  hideChat();
+  if (forced) alert("You have been logged out due to inactivity.");
+}

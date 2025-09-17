@@ -4,6 +4,7 @@
   padding: 0;
   box-sizing: border-box;
 }
+
 body {
   font-family: "Segoe UI", Roboto, sans-serif;
   background: linear-gradient(135deg, #1f1c2c, #928dab);
@@ -17,23 +18,25 @@ body {
 .username-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.65);
+  background: rgba(0, 0, 0, 0.65);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
 }
+
 .username-box {
   background: #fff;
   padding: 24px;
   border-radius: 12px;
   width: 320px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
   text-align: center;
 }
-.username-box h5 {
+
+.username-box h4 {
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   color: #333;
 }
 
@@ -46,26 +49,28 @@ body {
   flex-direction: column;
   gap: 10px;
   padding: 16px;
-  background: rgba(255,255,255,0.08);
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   backdrop-filter: blur(12px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   scroll-behavior: smooth;
 }
 
-/* Scrollbar styling */
+/* Scrollbar */
 #chat-box::-webkit-scrollbar {
   width: 6px;
 }
+
 #chat-box::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.4);
+  background: rgba(255, 255, 255, 0.4);
   border-radius: 4px;
 }
+
 #chat-box::-webkit-scrollbar-track {
   background: transparent;
 }
 
-/* --- Messages Base --- */
+/* --- Messages --- */
 .message {
   padding: 10px 16px;
   border-radius: 18px;
@@ -93,16 +98,16 @@ body {
   background: #0d6efd;
   color: #fff;
   border-bottom-right-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
-/* Other User Messages */
+/* Other Users */
 .message-other {
   align-self: flex-start;
   background: #6c757d;
   color: #fff;
   border-bottom-left-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
 /* --- Animations --- */
@@ -114,5 +119,22 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* --- Logout Button --- */
+.navbar .btn-danger {
+  display: none; /* Initially hidden, shown when logged in */
+  font-size: 0.9rem;
+  padding: 4px 10px;
+}
+
+/* --- Responsive --- */
+@media (max-width: 576px) {
+  #chat-box {
+    max-height: 50vh;
+  }
+  #chat-input {
+    font-size: 0.9rem;
   }
 }
