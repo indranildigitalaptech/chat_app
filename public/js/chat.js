@@ -1,4 +1,6 @@
-const socket = io();
+// Use backend URL from env (change in production)
+const BACKEND_URL = "https://team-spd-chat.vercel.app";   // Or "https://your-backend-url.com"
+const socket = io(BACKEND_URL);
 
 const chatBox = document.getElementById("chat-box");
 const chatForm = document.getElementById("chat-form");
@@ -36,7 +38,7 @@ if (myUsername) {
   hideChat();
 }
 
-// Escape HTML
+// HTML escape
 function escapeHtml(str) {
   if (!str) return "";
   return str.replace(/[&<>"'`=\/]/g, (s) =>
@@ -53,7 +55,7 @@ function escapeHtml(str) {
   );
 }
 
-// Username submission
+// Username submit
 usernameForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const name = usernameInput.value.trim();
@@ -65,9 +67,9 @@ usernameForm.addEventListener("submit", (e) => {
 });
 
 // Receive messages
-socket.on("message", (msg) => addMessage(msg));
+socket.on("message", addMessage);
 
-// Forced logout from server
+// Forced logout
 socket.on("forceLogout", () => doLogout(true));
 
 // Add message
