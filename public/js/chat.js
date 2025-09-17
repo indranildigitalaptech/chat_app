@@ -1,5 +1,5 @@
 // Use backend URL from env (change in production)
-const socket = io("https://team-spd-chat.vercel.app", {
+const socket = io("https://chat-app-rwfm.onrender.com", {
   transports: ["websocket", "polling"], // fallback to polling
 });
 
