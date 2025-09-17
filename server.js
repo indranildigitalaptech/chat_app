@@ -14,31 +14,36 @@ app.use(express.static(path.join(process.cwd(), "public")));
 app.set("views", path.join(process.cwd(), "views"));
 app.set("view engine", "ejs");
 
-const users = {}; // { socketId: username }
+const users = {}; // socketId -> username
 
 io.on("connection", (socket) => {
   console.log("✅ Connected:", socket.id);
 
-  // Wait for username before announcing
+  // Set username
   socket.on("setUsername", (username) => {
     if (!username) return;
     users[socket.id] = username;
 
-    // Welcome to the new user
+    // Welcome user
     socket.emit("message", { type: "system", text: `Welcome ${username} 🎉` });
 
     // Notify others
-    socket.broadcast.emit("message", { type: "system", text: `${username} joined the chat 👋` });
+    socket.broadcast.emit("message", {
+      type: "system",
+      text: `${username} joined the chat 👋`,
+    });
   });
 
-  // Chat message from client (text)
+  // Handle messages
   socket.on("message", (msg) => {
     const username = users[socket.id];
     if (!username) {
-      socket.emit("message", { type: "system", text: "⚠️ You must set a username before chatting." });
+      socket.emit("message", {
+        type: "system",
+        text: "⚠️ You must set a username before chatting.",
+      });
       return;
     }
-
     io.emit("message", { type: "user", username, text: msg });
   });
 
