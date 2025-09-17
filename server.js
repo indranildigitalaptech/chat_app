@@ -3,72 +3,52 @@ import path from "path";
 import http from "http";
 import dotenv from "dotenv";
 import { Server } from "socket.io";
-import cors from "cors";
-import helmet from "helmet";
-import hpp from "hpp";
 
-// apply configuration
 dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
+const io = new Server(server, { cors: { origin: "*" } });
 
-// create socket.io server
-const io = new Server(server, {
-  cors: { origin: "*" },
-});
-
-// serve static files
 app.use(express.static(path.join(process.cwd(), "public")));
-app.use(cors());
-app.use(helmet());
-app.use(hpp());
-
-// set view engine
 app.set("views", path.join(process.cwd(), "views"));
 app.set("view engine", "ejs");
 
-// Store connected users { socket.id: username }
-const users = {};
+const users = {}; // { socketId: username }
 
-// --- SOCKET HANDLER ---
 io.on("connection", (socket) => {
-  console.log("New User connected:", socket.id);
+  console.log("✅ Connected:", socket.id);
 
-  // Send welcome only to that user
-  socket.emit("message", { type: "system", text: "Welcome to the chat 🎉" });
-
-  // Handle setting username
+  // Wait for username before announcing
   socket.on("setUsername", (username) => {
-    users[socket.id] = username || "Anonymous";
+    if (!username) return;
+    users[socket.id] = username;
+
+    // Welcome to the new user
+    socket.emit("message", { type: "system", text: `Welcome ${username} 🎉` });
 
     // Notify others
-    socket.broadcast.emit("message", {
-      type: "system",
-      text: `${users[socket.id]} joined the chat 👋`,
-    });
+    socket.broadcast.emit("message", { type: "system", text: `${username} joined the chat 👋` });
   });
 
-  // When receiving a message
+  // Chat message from client (text)
   socket.on("message", (msg) => {
-    if (!users[socket.id]) return; // ignore until username is set
+    const username = users[socket.id];
+    if (!username) {
+      socket.emit("message", { type: "system", text: "⚠️ You must set a username before chatting." });
+      return;
+    }
 
-    io.emit("message", {
-      type: "user",
-      user: users[socket.id],
-      text: msg,
-    });
+    io.emit("message", { type: "user", username, text: msg });
   });
 
-  // Handle disconnect
+  // Disconnect
   socket.on("disconnect", () => {
-    const username = users[socket.id] || "A user";
-    delete users[socket.id];
-
-    io.emit("message", {
-      type: "system",
-      text: `${username} left the chat ❌`,
-    });
+    const username = users[socket.id];
+    if (username) {
+      io.emit("message", { type: "system", text: `${username} left the chat ❌` });
+      delete users[socket.id];
+    }
   });
 });
 
@@ -76,6 +56,7 @@ app.get("/", (req, res) => {
   res.render("index");
 });
 
-server.listen(process.env.PORT || 4200, () => {
-  console.log(`✅ Server is running on port ${process.env.PORT || 4200}`);
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
